@@ -41,6 +41,7 @@ lifting1 <- lifting1 %>%
 # fit model and save as mod1
 mod1 <- lifting1 %>%
  with(glm(LiftingSuccess ~ AgeClass + Sex, family = binomial))
+print(mod1)
 ```
 
 ```{r get-coefficient-estimates-mod1}
@@ -71,14 +72,30 @@ lifting1 %>%
   mutate(condprop = n/sum(n))
 ```
 
-```{r}
-# set up data frame with people we want to predict for
-predict.data <- data.frame(Sex = c('F', 'M', 'F', 'M'),
-                           AgeClass = c('20-23', '20-23', '24-34', '24-34'))
-print(predict.data)
 
-# prediction based on model without interaction
+```{r predicted-probability-boxplots}
+# predicted probability boxplots for mod2
 mod1 %>%
-  predict(newdata = predict.data, type = 'response')
+  augment(type.predict = 'response') %>% ## get predicted probabilities from model
+  ggplot(aes(y = .fitted, x = factor(LiftingSuccess))) + ## compare predicted probabilites to actual outcome
+  geom_boxplot() + 
+  ylab('Predicted Probability of Successfully Lifting') + 
+  xlab('Actual Outcome (1 = Success, 0 = Fail)') + 
+  theme_classic() + 
+  ggtitle('Predictions from Mod1')
+```
+
+```{r model-quality-metrics}
+# get binary predictions for mod1
+threshold <- 0.86
+lift <- mod1 %>%
+  augment(type.predict = 'response') %>% 
+  mutate(predictSuccess = .fitted >= threshold) %>% 
+  count(LiftingSuccess, predictSuccess) 
+cat("Accuracy:", (lift$n[1] + lift$n[4])/(lift$n[1] + lift$n[4] + lift$n[2] + lift$n[3]), "\n")
+cat("Sensitivity:", lift$n[4]/(lift$n[4] + lift$n[3]), "\n")
+cat("Specificity:", lift$n[1]/(lift$n[2] + lift$n[1]), "\n")
+cat("False negative:", lift$n[3]/(lift$n[3]+lift$n[4]), "\n")
+cat("False positive:", lift$n[2]/(lift$n[1]+lift$n[2]), "\n")
 ```
 
