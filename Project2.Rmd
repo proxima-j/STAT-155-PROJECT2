@@ -1,0 +1,35 @@
+---
+title: "project2"
+author: "Xiang Li, Jenny Li"
+date: "2021/11/3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-packages, message = FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(ggmosaic)
+library(broom)
+```
+
+```{r load-data, message = FALSE}
+# your code here
+lifting <- read_csv (file = "openpowerlifting.csv")
+```
+
+> Introduction
+>
+> Research Question
+> Are lifters in age class 20-23 more likely to success than the ageclass 24-34 in Squat1kg?
+
+$$log(Odds[ Lifting Success | ageclass, sex ] = \beta_0 + \beta_1 ageclass20-23 + \beta_2 ageclass24-34 + \beta_3 sexmale $$
+```{r}
+lifting1<- lifting %>%
+  filter(AgeClass %in% c("20-23", "24-34"))
+```
+
