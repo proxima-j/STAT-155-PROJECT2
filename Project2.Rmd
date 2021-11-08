@@ -27,9 +27,58 @@ lifting <- read_csv (file = "openpowerlifting.csv")
 > Research Question
 > Are lifters in age class 20-23 more likely to success than the ageclass 24-34 in Squat1kg?
 
-$$log(Odds[ Lifting Success | ageclass, sex ] = \beta_0 + \beta_1 ageclass20-23 + \beta_2 ageclass24-34 + \beta_3 sexmale $$
+$$log(Odds[ Lifting Success = 1 | ageclass, sex ] = \beta_0 + \beta_1 ageclass24-34 + \beta_2 sexmale $$
 ```{r}
-lifting1<- lifting %>%
+# Filter data ageclass
+lifting1<- lifting[!is.na(lifting$Squat1Kg), ] %>%
   filter(AgeClass %in% c("20-23", "24-34"))
+```
+
+```{r}
+# define variable create liftingsuccess
+lifting1 <- lifting1 %>%
+  mutate(LiftingSuccess = ifelse(lifting1$Squat1Kg > 0, 1, 0))
+# fit model and save as mod1
+mod1 <- lifting1 %>%
+ with(glm(LiftingSuccess ~ AgeClass + Sex, family = binomial))
+```
+
+```{r get-coefficient-estimates-mod1}
+# print out tidy summary of mod, focusing on estimates & exponentiated estimates
+tidy(mod1) %>%
+  mutate(estimate_exp = exp(estimate))
+```
+
+```{r}
+# create mosaic plot of liftingsuccess vs ageclass and sex
+lifting1 %>%
+  ggplot() + 
+  geom_mosaic(aes(x = product(LiftingSuccess, Sex), fill = LiftingSuccess)) +
+  facet_grid(. ~ AgeClass) +
+  scale_fill_manual('Successfully Lifting? \n(1 = success, 0 = fail)', values = c('lightblue', 'steelblue')) + 
+  labs(x = 'Inferred Binary Gender (F = female, M = male)', y = 'Successfully Lifting? (1 = yes, 0 = no)', title = "Successfully Lifting vs Sex and AgeClass")+
+  theme_bw(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12), 
+        axis.text.x = element_text(hjust = 1, vjust = 1))
+```
+
+```{r numerical-summaries}
+# corresponding numerical summaries
+lifting1 %>%
+  group_by(Sex, AgeClass) %>%
+  count(LiftingSuccess) %>%
+  group_by(Sex, AgeClass) %>%
+  mutate(condprop = n/sum(n))
+```
+
+```{r}
+# set up data frame with people we want to predict for
+predict.data <- data.frame(Sex = c('F', 'M', 'F', 'M'),
+                           AgeClass = c('20-23', '20-23', '24-34', '24-34'))
+print(predict.data)
+
+# prediction based on model without interaction
+mod1 %>%
+  predict(newdata = predict.data, type = 'response')
 ```
 
