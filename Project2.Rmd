@@ -32,6 +32,10 @@ $$log(Odds[ Lifting Success = 1 | ageclass, sex ] = \beta_0 + \beta_1 ageclass24
 # Filter data ageclass
 lifting1<- lifting[!is.na(lifting$Squat1Kg), ] %>%
   filter(AgeClass %in% c("20-23", "24-34"))
+
+#change sex to equipment
+# lifting1<- lifting[!is.na(lifting$Squat1Kg), ] %>%
+#   filter(AgeClass %in% c("20-23", "24-34")&Equipment %in% c("Raw", "Wraps") )
 ```
 
 ```{r}
@@ -42,6 +46,10 @@ lifting1 <- lifting1 %>%
 mod1 <- lifting1 %>%
  with(glm(LiftingSuccess ~ AgeClass + Sex, family = binomial))
 print(mod1)
+# 
+# mod1 <- lifting1 %>%
+#  with(glm(LiftingSuccess ~ AgeClass + Equipment, family = binomial))
+# print(mod1)
 ```
 
 ```{r get-coefficient-estimates-mod1}
@@ -61,6 +69,16 @@ lifting1 %>%
   theme_bw(base_size = 14) +
   theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12), 
         axis.text.x = element_text(hjust = 1, vjust = 1))
+
+# lifting1 %>%
+#   ggplot() + 
+#   geom_mosaic(aes(x = product(LiftingSuccess, Equipment), fill = LiftingSuccess)) +
+#   facet_grid(. ~ AgeClass) +
+#   scale_fill_manual('Successfully Lifting? \n(1 = success, 0 = fail)', values = c('lightblue', 'steelblue')) + 
+#   labs(x = 'Inferred Binary Equipment ', y = 'Successfully Lifting? (1 = yes, 0 = no)', title = "Successfully Lifting vs Equipment and AgeClass")+
+#   theme_bw(base_size = 14) +
+#   theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12), 
+#         axis.text.x = element_text(hjust = 1, vjust = 1))
 ```
 
 ```{r numerical-summaries}
@@ -70,6 +88,12 @@ lifting1 %>%
   count(LiftingSuccess) %>%
   group_by(Sex, AgeClass) %>%
   mutate(condprop = n/sum(n))
+
+# lifting1 %>%
+#   group_by(Equipment, AgeClass) %>%
+#   count(LiftingSuccess) %>%
+#   group_by(Equipment, AgeClass) %>%
+#   mutate(condprop = n/sum(n))
 ```
 
 
@@ -83,11 +107,21 @@ mod1 %>%
   xlab('Actual Outcome (1 = Success, 0 = Fail)') + 
   theme_classic() + 
   ggtitle('Predictions from Mod1')
+
+# mod1 %>%
+#   augment(type.predict = 'response') %>% ## get predicted probabilities from model
+#   ggplot(aes(y = .fitted, x = factor(LiftingSuccess))) + ## compare predicted probabilites to actual outcome
+#   geom_boxplot() + 
+#   ylab('Predicted Probability of Successfully Lifting') + 
+#   xlab('Actual Outcome (1 = Success, 0 = Fail)') + 
+#   theme_classic() + 
+#   ggtitle('Predictions from Mod1')
 ```
 
 ```{r model-quality-metrics}
 # get binary predictions for mod1
 threshold <- 0.85
+#threshold <- 0.88
 lift <- mod2 %>%
   augment(type.predict = 'response') %>% 
   mutate(predictSuccess = .fitted >= threshold) %>% 
