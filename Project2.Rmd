@@ -74,7 +74,7 @@ lifting1 %>%
 
 
 ```{r predicted-probability-boxplots}
-# predicted probability boxplots for mod2
+# predicted probability boxplots for mod1
 mod1 %>%
   augment(type.predict = 'response') %>% ## get predicted probabilities from model
   ggplot(aes(y = .fitted, x = factor(LiftingSuccess))) + ## compare predicted probabilites to actual outcome
@@ -87,8 +87,8 @@ mod1 %>%
 
 ```{r model-quality-metrics}
 # get binary predictions for mod1
-threshold <- 0.86
-lift <- mod1 %>%
+threshold <- 0.85
+lift <- mod2 %>%
   augment(type.predict = 'response') %>% 
   mutate(predictSuccess = .fitted >= threshold) %>% 
   count(LiftingSuccess, predictSuccess) 
