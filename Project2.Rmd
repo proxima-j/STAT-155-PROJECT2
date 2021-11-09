@@ -35,7 +35,7 @@ lifting1<- lifting[!is.na(lifting$Squat1Kg), ] %>%
 
 #change sex to equipment
 # lifting1<- lifting[!is.na(lifting$Squat1Kg), ] %>%
-#   filter(AgeClass %in% c("20-23", "24-34")&Equipment %in% c("Raw", "Wraps") )
+#   filter(AgeClass %in% c("20-23", "24-34") & Equipment %in% c("Raw", "Wraps") )
 ```
 
 ```{r}
