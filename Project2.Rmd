@@ -27,15 +27,19 @@ lifting <- read_csv (file = "openpowerlifting.csv")
 > Research Question
 > Are lifters in age class 20-23 more likely to success than the ageclass 24-34 in Squat1kg?
 
-$$log(Odds[ Lifting Success = 1 | ageclass, sex ] = \beta_0 + \beta_1 ageclass24-34 + \beta_2 sexmale $$
+$$log(Odds[ Lifting Success = 1 | ageclass, equipment ] = \beta_0 + \beta_1 ageclass24-34 + \beta_2 equipmentSingle-ply $$
+
 ```{r}
 # Filter data ageclass
 lifting1<- lifting[!is.na(lifting$Squat1Kg), ] %>%
   filter(AgeClass %in% c("20-23", "24-34"))
-
-#change sex to equipment
-# lifting1<- lifting[!is.na(lifting$Squat1Kg), ] %>%
-#   filter(AgeClass %in% c("20-23", "24-34") & Equipment %in% c("Raw", "Wraps") )
+# Count the number unsed of equipment
+lifting1 %>%
+    group_by(Equipment) %>%
+    summarise(Count = n())
+#filter the equipment
+lifting1 <- lifting[!is.na(lifting$Squat1Kg), ] %>%
+   filter(AgeClass %in% c("20-23", "24-34") & Equipment %in% c("Raw", "Single-ply") )
 ```
 
 ```{r}
@@ -44,56 +48,36 @@ lifting1 <- lifting1 %>%
   mutate(LiftingSuccess = ifelse(lifting1$Squat1Kg > 0, 1, 0))
 # fit model and save as mod1
 mod1 <- lifting1 %>%
- with(glm(LiftingSuccess ~ AgeClass + Sex, family = binomial))
-print(mod1)
-# 
-# mod1 <- lifting1 %>%
-#  with(glm(LiftingSuccess ~ AgeClass + Equipment, family = binomial))
-# print(mod1)
+   with(glm(LiftingSuccess ~ AgeClass + Equipment, family = binomial))
+   print(mod1)
 ```
 
 ```{r get-coefficient-estimates-mod1}
-# print out tidy summary of mod, focusing on estimates & exponentiated estimates
+# print out tidy summary of mod1, focusing on estimates & exponentiated estimates
 tidy(mod1) %>%
   mutate(estimate_exp = exp(estimate))
 ```
 
 ```{r}
-# create mosaic plot of liftingsuccess vs ageclass and sex
+# create mosaic plot of liftingsuccess vs ageclass and equipment
 lifting1 %>%
   ggplot() + 
-  geom_mosaic(aes(x = product(LiftingSuccess, Sex), fill = LiftingSuccess)) +
+  geom_mosaic(aes(x = product(LiftingSuccess, Equipment), fill = LiftingSuccess)) +
   facet_grid(. ~ AgeClass) +
   scale_fill_manual('Successfully Lifting? \n(1 = success, 0 = fail)', values = c('lightblue', 'steelblue')) + 
-  labs(x = 'Inferred Binary Gender (F = female, M = male)', y = 'Successfully Lifting? (1 = yes, 0 = no)', title = "Successfully Lifting vs Sex and AgeClass")+
+  labs(x = 'Inferred Binary Equipment', y = 'Successfully Lifting? (1 = yes, 0 = no)', title = "Successfully Lifting vs Equipment and AgeClass")+
   theme_bw(base_size = 14) +
   theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12), 
         axis.text.x = element_text(hjust = 1, vjust = 1))
-
-# lifting1 %>%
-#   ggplot() + 
-#   geom_mosaic(aes(x = product(LiftingSuccess, Equipment), fill = LiftingSuccess)) +
-#   facet_grid(. ~ AgeClass) +
-#   scale_fill_manual('Successfully Lifting? \n(1 = success, 0 = fail)', values = c('lightblue', 'steelblue')) + 
-#   labs(x = 'Inferred Binary Equipment ', y = 'Successfully Lifting? (1 = yes, 0 = no)', title = "Successfully Lifting vs Equipment and AgeClass")+
-#   theme_bw(base_size = 14) +
-#   theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12), 
-#         axis.text.x = element_text(hjust = 1, vjust = 1))
 ```
 
 ```{r numerical-summaries}
-# corresponding numerical summaries
+# corresponding numerical summaries for mod1
 lifting1 %>%
-  group_by(Sex, AgeClass) %>%
+  group_by(Equipment, AgeClass) %>%
   count(LiftingSuccess) %>%
-  group_by(Sex, AgeClass) %>%
+  group_by(Equipment, AgeClass) %>%
   mutate(condprop = n/sum(n))
-
-# lifting1 %>%
-#   group_by(Equipment, AgeClass) %>%
-#   count(LiftingSuccess) %>%
-#   group_by(Equipment, AgeClass) %>%
-#   mutate(condprop = n/sum(n))
 ```
 
 
@@ -107,29 +91,19 @@ mod1 %>%
   xlab('Actual Outcome (1 = Success, 0 = Fail)') + 
   theme_classic() + 
   ggtitle('Predictions from Mod1')
-
-# mod1 %>%
-#   augment(type.predict = 'response') %>% ## get predicted probabilities from model
-#   ggplot(aes(y = .fitted, x = factor(LiftingSuccess))) + ## compare predicted probabilites to actual outcome
-#   geom_boxplot() + 
-#   ylab('Predicted Probability of Successfully Lifting') + 
-#   xlab('Actual Outcome (1 = Success, 0 = Fail)') + 
-#   theme_classic() + 
-#   ggtitle('Predictions from Mod1')
 ```
 
 ```{r model-quality-metrics}
 # get binary predictions for mod1
 threshold <- 0.85
-#threshold <- 0.88
-lift <- mod2 %>%
+lift1 <- mod1 %>%
   augment(type.predict = 'response') %>% 
   mutate(predictSuccess = .fitted >= threshold) %>% 
   count(LiftingSuccess, predictSuccess) 
-cat("Accuracy:", (lift$n[1] + lift$n[4])/(lift$n[1] + lift$n[4] + lift$n[2] + lift$n[3]), "\n")
-cat("Sensitivity:", lift$n[4]/(lift$n[4] + lift$n[3]), "\n")
-cat("Specificity:", lift$n[1]/(lift$n[2] + lift$n[1]), "\n")
-cat("False negative:", lift$n[3]/(lift$n[3]+lift$n[4]), "\n")
-cat("False positive:", lift$n[2]/(lift$n[1]+lift$n[2]), "\n")
+cat("Accuracy:", (lift1$n[1] + lift1$n[4])/(lift1$n[1] + lift1$n[4] + lift1$n[2] + lift1$n[3]), "\n")
+cat("Sensitivity:", lift1$n[4]/(lift1$n[4] + lift1$n[3]), "\n")
+cat("Specificity:", lift1$n[1]/(lift1$n[2] + lift1$n[1]), "\n")
+cat("False negative:", lift1$n[3]/(lift1$n[3]+lift1$n[4]), "\n")
+cat("False positive:", lift1$n[2]/(lift1$n[1]+lift1$n[2]), "\n")
 ```
 
