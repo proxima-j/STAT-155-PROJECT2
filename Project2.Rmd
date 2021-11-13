@@ -27,7 +27,7 @@ lifting <- read_csv (file = "openpowerlifting.csv")
 > Research Question
 > Are lifters in age class 20-23 more likely to success than the ageclass 24-34 in Squat1kg?
 
-$$log(Odds[ Lifting Success = 1 | ageclass, equipment ] = \beta_0 + \beta_1 ageclass24-34 + \beta_2 equipmentSingle-ply $$
+$$log(\widehat{Odds}[ Lifting Success = 1 | ageclass, equipment ] = \beta_0 + \beta_1 ageclass24-34 + \beta_2 equipmentSingle-ply $$
 
 ```{r}
 # Filter data ageclass
