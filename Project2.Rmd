@@ -58,7 +58,7 @@ mod1 <- lifting1 %>%
 
 ```{r get-coefficient-estimates-mod1}
 # print out tidy summary of mod1, focusing on estimates & exponentiated estimates
-tidy(mod1) %>%
+tidy(mod1,conf.int = TRUE) %>%
   mutate(estimate_exp = exp(estimate))
 ```
 
