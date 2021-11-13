@@ -30,10 +30,14 @@ lifting <- read_csv (file = "openpowerlifting.csv")
 $$log(\widehat{Odds}[ Lifting Success = 1 | ageclass, equipment ] = \beta_0 + \beta_1 ageclass24-34 + \beta_2 equipmentSingle-ply $$
 
 ```{r}
+# Count the number each age class
+lifting %>%
+    group_by(AgeClass) %>%
+    summarise(Count = n())
 # Filter data ageclass
 lifting1<- lifting[!is.na(lifting$Squat1Kg), ] %>%
   filter(AgeClass %in% c("20-23", "24-34"))
-# Count the number unsed of equipment
+# Count the number of each equipment
 lifting1 %>%
     group_by(Equipment) %>%
     summarise(Count = n())
