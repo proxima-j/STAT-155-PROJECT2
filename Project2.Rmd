@@ -74,6 +74,18 @@ lifting1 %>%
   theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12), 
         axis.text.x = element_text(hjust = 1, vjust = 1))
 ```
+```{r}
+# create mosaic plot of liftingsuccess vs ageclass and equipment
+lifting1 %>%
+  ggplot() + 
+  geom_mosaic(aes(x = product(LiftingSuccess, AgeClass), fill = LiftingSuccess)) +
+  facet_grid(. ~ Equipment) +
+  scale_fill_manual('Successfully Lifting? \n(1 = success, 0 = fail)', values = c('lightblue', 'steelblue')) + 
+  labs(x = 'Inferred Binary Equipment', y = 'Successfully Lifting? (1 = yes, 0 = no)', title = "Successfully Lifting vs Equipment and AgeClass")+
+  theme_bw(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12), 
+        axis.text.x = element_text(hjust = 1, vjust = 1))
+```
 
 ```{r numerical-summaries}
 # corresponding numerical summaries for mod1
