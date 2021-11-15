@@ -1,5 +1,5 @@
 ---
-title: "project2"
+title: "Project2"
 author: "Xiang Li, Jenny Li"
 date: "2021/11/3"
 output: html_document
