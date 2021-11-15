@@ -60,7 +60,7 @@ mod1 <- lifting1 %>%
 # print out tidy summary of mod1, focusing on estimates & exponentiated estimates
 tidy(mod1,conf.int = TRUE) %>%
   mutate(estimate_exp = exp(estimate))
-#exponentiated confidence interval
+#exponentiated confidence interval for mod1
 exp(confint(mod1))
 ```
 
