@@ -126,6 +126,8 @@ kable(mytab)
 
 We estimate that the odds of successfully lifting for liters among those in the age class 20-23 and with raw equipment is 8.8601. We estimate that the odds of successfully lifting for lifters in the age class 24-34 are only 0.9506319 higher than the odds of successfully lifting for lifters in the age class 20-23 who used the same equipment. We estimate that the odds of successfully lifting for lifters in single-ply equipment are only 0.4395101 higher than the odds of successfully lifting for lifters in raw equipment in the same age class. These odds numbers show the relationship of lifting success rate with age class and the use of equipment is relatively weak. The odds ratio of a lifter is 0.9506 times higher for age class 24-34 compared to age class 20-23, holding equipment constant. Since the odds ratio of age class 24-34 is less than 1, referring to the fact that the success rate of lifters in age class 24-34 is less than the successful lifting rate of lifters in the age class 20-23 when holding the equipment constant. The odds ratio that lifters successfully lift is 0.4400 times higher for lifters who are inferred to be single-ply compared to those inferred to be raw, holding the age class constant. 
 
+> Model Evaluation
+
 ```{r numerical-summaries, echo=FALSE, message=FALSE, warning=FALSE}
 # corresponding numerical summaries for mod1
 lifting1 %>%
