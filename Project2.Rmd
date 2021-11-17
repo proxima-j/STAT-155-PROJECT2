@@ -124,6 +124,8 @@ kable(mytab)
 
 > Model Interpretation
 
+We estimate that the odds of successfully lifting for liters among those in the age class 20-23 and with raw equipment is 8.8601. We estimate that the odds of successfully lifting for lifters in the age class 24-34 are only 0.9506319 higher than the odds of successfully lifting for lifters in the age class 20-23 who used the same equipment. We estimate that the odds of successfully lifting for lifters in single-ply equipment are only 0.4395101 higher than the odds of successfully lifting for lifters in raw equipment in the same age class. These odds numbers show the relationship of lifting success rate with age class and the use of equipment is relatively weak. The odds ratio of a lifter is 0.9506 times higher for age class 24-34 compared to age class 20-23, holding equipment constant. Since the odds ratio of age class 24-34 is less than 1, referring to the fact that the success rate of lifters in age class 24-34 is less than the successful lifting rate of lifters in the age class 20-23 when holding the equipment constant. The odds ratio that lifters successfully lift is 0.4400 times higher for lifters who are inferred to be single-ply compared to those inferred to be raw, holding the age class constant. 
+
 ```{r numerical-summaries, echo=FALSE, message=FALSE, warning=FALSE}
 # corresponding numerical summaries for mod1
 lifting1 %>%
@@ -132,6 +134,8 @@ lifting1 %>%
   group_by(Equipment, AgeClass) %>%
   mutate(condprop = n/sum(n))
 ```
+
+For the numerical summary, we look at the conditional proportion of lifters who did or did not successfully lift, given the lifter's inferred age class and equipment. It has shown a 90 percent chance that a lifter could successfully lift when falling into the category of 20-23 age class and with raw equipment, whereas when the lifter is in the age class of 24-34 and with raw equipment, the chance of successful lift will decrease to 89 percent. This is in line with the exponentiated beta 1 in the logistic model, the exponentiated coefficient of the age class variable, which is approaching 1, that although larger age might have a negative effect on the success rate of lift, it does not have a large impact on it. Moreover, if the lifter fell into the category of age class 20-23 and with Single-ply equipment, the chance of successful lift would be down to 79 percent. This also matches with the exponentiated beta 2 in the logistic regression, the exponentiated coefficient of the equipment variable, that applied single-ply as the equipment when lifting has a negative effect on the success rate, and it would have a relatively larger effect on it compared to the age class.
 
 ```{r predicted-probability-boxplots, echo=FALSE, message=FALSE, warning=FALSE}
 # predicted probability boxplots for mod1
@@ -144,6 +148,8 @@ mod1 %>%
   theme_classic() + 
   ggtitle('Predictions from Mod1')
 ```
+
+For the graphical summaries, notice that our model tends to predict a slightly higher probability of success lift for lifters that did lift successfully than it does for lifters who did not: the predicted probability of success lift is above around 0.8 for most of the lifters(over 75%) that lifted successfully, and around 0.78 for most of the lifters that did not lift successfully. However, since overall they are very similar and there is so much overlap in the box plots, they suggest that our model can't classify or separate those who did lift successfully and who did not base just on their age class(particular for age class 20-23 and 24-34) and equipment(raw and single-ply). This is in line with the fact that the accuracy of the model is relatively not very high.
 
 ```{r model-quality-metrics, echo=FALSE, message=FALSE, warning=FALSE}
 # get binary predictions for mod1
@@ -159,8 +165,9 @@ cat("False negative:", lift1$n[3]/(lift1$n[3]+lift1$n[4]), "\n")
 cat("False positive:", lift1$n[2]/(lift1$n[1]+lift1$n[2]), "\n")
 ```
 
-> Conclusion
-> General Takeaways
+Overall, the model has an accuracy of 0.6674 at predicting a lifter's lifting status correctly, predicting the lifter successfully lifting that actual success and predicting the lifter not successfully lifting that actually not success. The accuracy is 0.6674. In this case, the sensitivity is 0.6946, which means 0.6946 of them, the model predicted lifters successfully lifting that actual success. In this case, the specificity is  0.4990. The specificity is the proportion of the lifters who we predicted did not succeed that actually did not succeed. In addition, the false negative is 0.3054, which predicted did not successfully lift, but actually succeeded. This might be a disappointment for the lifters expecting a successful lift, but they didn't. On the other hand, the false positive is 0.5010, which predicted a successful lift, but actually not success. This might encourage the lifters to change to a higher lift or increase their confidence in lifting. Also, the logistic linear guaranteed to always get predictions between 0 and 1, which ensures the estimates' results are reasonable.
+
+> Conclusion (General Takeaways)
 
 In summary, we could conclude that age and equipment do impact the success lift respectively. It has shown that if a lifter falls into the older age class, 24-34, it would be less likely to lift successfully than a lifter in the younger age group,20-23, holding other conduction constants. Moreover, if a lifter prefers to apply single-ply as the equipment, they would be less likely to lift successfully compared to others who prefer raw equipment in the same age class. However, the effect of age seems to be not significant, the chance of a lifter lifting successfully in both age classes with either equipment. The difference of equipment shows a relatively more explicit effect on the result, no matter which age class the lifter is in. Thus further research on the topic is needed.
 
