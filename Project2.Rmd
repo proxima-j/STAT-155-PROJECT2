@@ -26,7 +26,9 @@ Sport, as an area receiving increased attention, responds as a result of increas
 
 In order to find out why someone is more likely to lift while others don't, we decided to use the dataset that records the information of power lifting competitions over 22,000 meets and 412,000 lifters from competitors worldwide. Based on the massive amount of data, for accuracy and feasibility, we decided to narrow down our research question to: does a lifter's age and equipment impact the chance that they successfully lifted as expected? The response variable in this question contains a binary outcome, which would be narrowed down as the results in the category Squat1kg. The two explanatory variables are age and equipment. For the age class, we plan to focus on two specific age groups: "20-23" and "24-34". For equipment, we focus on the most popular equipment: "Raw" and "Single-ply". (Raw is categorized as equipment in the data, thus we continue it as equipment here.)
 
-> Data Context
+> Data 
+
+> Context
 
 In this report, we’ll use data from the OpenPowerlifting database as of April 2019. OpenPowerlifting is creating a public-domain archive of power lifting history. Power lifting is a sport in which competitors compete to lift the most weight for their class in three separate barbell lifts: the Squat, Bench, and Dead lift. The data is represented by openpowerlifting.csv, which includes all information on the meets (competitions) as well as the competitors who attended those meets worldwide. This dataset tracks 2554800 entries for 668172 lifters from 39909 meets. All the data in the dataset are collected by a team of about eight power lifters from official results posted on federations’ websites. Find more information about the dataset and download the openpowerlifting.csv file on Kaggle: https://www.kaggle.com/open-powerlifting/powerlifting-database. 
 
@@ -58,6 +60,8 @@ lifting1 <- lifting[!is.na(lifting$Squat1Kg), ] %>%
 lifting1 <- lifting1 %>%
   mutate(LiftingSuccess = ifelse(lifting1$Squat1Kg > 0, 1, 0))
 ```
+
+> Logistic Regression
 
 > Exploratory Data Analysis
 
@@ -91,7 +95,7 @@ lifting1 %>%
 
 > Model Creation
 
->Research Question:Are lifters in age class 20-23 more likely to success than the ageclass 24-34 in Squat1kg?
+>Research Question: Are lifters in age class 20-23 more likely to success than the ageclass 24-34 in Squat1kg?
 
 $$log(\widehat{Odds}[ Lifting Success = 1 | ageclass, equipment ] = \beta_0 + \beta_1 ageclass24-34 + \beta_2 equipmentSingleply $$
 We consider that equipment would be a direct predictor of whether the lifter successfully lifted. At the same time, age class might be a confounder that is worth including since people of different age classes might prefer different equipment, and it might also directly affect the results. Other variables such as age, we consider redundant toward the age class, and the success rate of different lifting attempts is similar to the Squat 1kg. A logistic regression model is used to predict the categorical dependent variable with the help of independent variables. We fit this dataset in logistic regression because Lifting Success is a binary categorical outcome, which fits better in the logistic regression model.
@@ -169,7 +173,9 @@ cat("False positive:", lift1$n[2]/(lift1$n[1]+lift1$n[2]), "\n")
 
 Overall, the model has an accuracy of 0.6674 at predicting a lifter's lifting status correctly, predicting the lifter successfully lifting that actual success and predicting the lifter not successfully lifting that actually not success. The accuracy is 0.6674. In this case, the sensitivity is 0.6946, which means 0.6946 of them, the model predicted lifters successfully lifting that actual success. In this case, the specificity is  0.4990. The specificity is the proportion of the lifters who we predicted did not succeed that actually did not succeed. In addition, the false negative is 0.3054, which predicted did not successfully lift, but actually succeeded. This might be a disappointment for the lifters expecting a successful lift, but they didn't. On the other hand, the false positive is 0.5010, which predicted a successful lift, but actually not success. This might encourage the lifters to change to a higher lift or increase their confidence in lifting. Also, the logistic linear guaranteed to always get predictions between 0 and 1, which ensures the estimates' results are reasonable.
 
-> Conclusion (General Takeaways)
+> Conclusion 
+
+> General Takeaways
 
 In summary, we could conclude that age and equipment do impact the success lift respectively. It has shown that if a lifter falls into the older age class, 24-34, it would be less likely to lift successfully than a lifter in the younger age group,20-23, holding other conduction constants. Moreover, if a lifter prefers to apply single-ply as the equipment, they would be less likely to lift successfully compared to others who prefer raw equipment in the same age class. However, the effect of age seems to be not significant, the chance of a lifter lifting successfully in both age classes with either equipment. The difference of equipment shows a relatively more explicit effect on the result, no matter which age class the lifter is in. Thus further research on the topic is needed.
 
